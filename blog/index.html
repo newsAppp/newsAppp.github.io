@@ -4,145 +4,819 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-  <title>Blog Index</title>
-  <meta name="description" content="A list of all blog posts">
-  <meta name="keywords" content="blog, News Flash, posts">
+  <title>News Flash Blog</title>
+  <meta name="description" content="Latest articles and insights from News Flash">
+  <meta name="keywords" content="blog, News Flash, technology, insights, articles">
   <meta name="author" content="News Flash">
   <link rel="canonical" href="https://newsflashh.com">
   <script async src="https://cdn.ampproject.org/v0.js"></script>
+  <script async custom-element="amp-bind" src="https://cdn.ampproject.org/v0/amp-bind-0.1.js"></script>
+  <script async custom-element="amp-form" src="https://cdn.ampproject.org/v0/amp-form-0.1.js"></script>
+  <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style>
   <style amp-custom>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1e40af;
+      --background-color: #f8fafc;
+      --text-color: #1e293b;
+      --card-background: #ffffff;
     }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+    }
+
     header {
-      background: #fff;
-      padding: 16px;
-      border-bottom: 1px solid #ddd;
+      background: var(--card-background);
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       position: sticky;
       top: 0;
       z-index: 1000;
     }
-    header a {
-      color: #007BFF;
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
       text-decoration: none;
-      margin-right: 16px;
     }
+
+    nav a {
+      color: var(--text-color);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--primary-color);
+    }
+
     main {
-      padding: 16px;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
-    .card {
-      background: #fff;
-      padding: 16px;
-      margin-bottom: 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .search-section {
+      margin-bottom: 2rem;
     }
-    .date {
-      color: #888;
-      font-size: 14px;
+
+    .search-box {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .search-box:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.25rem;
+      background-color: #e2e8f0;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .filter-btn[selected] {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .post-card {
+      background: var(--card-background);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .post-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .post-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      color: var(--text-color);
+      text-decoration: none;
+    }
+
+    .post-meta {
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+
+    footer {
+      background: var(--card-background);
+      padding: 2rem 1rem;
+      text-align: center;
+      margin-top: 4rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      nav a {
+        margin-left: 0;
+      }
     }
   </style>
 </head>
 <body>
-
-  <!-- App Bar -->
   <header>
-    <h1><a href="https://newsflashh.com">News Flash</a></h1>
-    <nav>
-      <a href="https://newsflashh.com">Home</a>
-      <a href="https://newsflashh.com/#/contact-us">Contact Us</a>
-    </nav>
+    <div class="header-content">
+      <a href="https://newsflashh.com" class="logo">News Flash</a>
+      <nav>
+        <a href="https://newsflashh.com">Home</a>
+        <a href="https://newsflashh.com/categories">Categories</a>
+        <a href="https://newsflashh.com/about">About</a>
+        <a href="https://newsflashh.com/contact">Contact</a>
+      </nav>
+    </div>
   </header>
 
-  <!-- Blog Content -->
   <main>
-    <section class="card">
-      <h2>All Blog Posts</h2>
-      <ul>
-        <li class="date"><a href="journaling-for-self-discovery-a-beginner’s-guide.html" class="text-blue-500 font-semibold">Journaling-for-self-discovery-a-beginner’s-guide</a> <span class="text-gray-600">(2025-02-08 16:24:39)</span></li>
-<li class="date"><a href="building-healthy-boundaries-in-relationships.html" class="text-blue-500 font-semibold">Building-healthy-boundaries-in-relationships</a> <span class="text-gray-600">(2025-02-08 16:23:47)</span></li>
-<li class="date"><a href="how-to-overcome-procrastination.html" class="text-blue-500 font-semibold">How-to-overcome-procrastination</a> <span class="text-gray-600">(2025-02-08 16:23:11)</span></li>
-<li class="date"><a href="simple-ways-to-boost-your-confidence.html" class="text-blue-500 font-semibold">Simple-ways-to-boost-your-confidence</a> <span class="text-gray-600">(2025-02-08 16:21:42)</span></li>
-<li class="date"><a href="how-to-improve-communication-in-relationships.html" class="text-blue-500 font-semibold">How-to-improve-communication-in-relationships</a> <span class="text-gray-600">(2025-02-08 16:21:01)</span></li>
-<li class="date"><a href="essential-travel-apps-you-need-in-2025.html" class="text-blue-500 font-semibold">Essential-travel-apps-you-need-in-2025</a> <span class="text-gray-600">(2025-02-08 16:20:25)</span></li>
-<li class="date"><a href="how-to-find-cheap-flights-every-time.html" class="text-blue-500 font-semibold">How-to-find-cheap-flights-every-time</a> <span class="text-gray-600">(2025-02-08 16:19:44)</span></li>
-<li class="date"><a href="top-underrated-travel-destinations.html" class="text-blue-500 font-semibold">Top-underrated-travel-destinations</a> <span class="text-gray-600">(2025-02-08 16:19:08)</span></li>
-<li class="date"><a href="how-to-pack-light-for-any-trip.html" class="text-blue-500 font-semibold">How-to-pack-light-for-any-trip</a> <span class="text-gray-600">(2025-02-08 16:18:23)</span></li>
-<li class="date"><a href="best-travel-insurance-for-international-trips.html" class="text-blue-500 font-semibold">Best-travel-insurance-for-international-trips</a> <span class="text-gray-600">(2025-02-08 16:17:55)</span></li>
-<li class="date"><a href="cleaning-hacks-for-busy-people.html" class="text-blue-500 font-semibold">Cleaning-hacks-for-busy-people</a> <span class="text-gray-600">(2025-02-08 16:17:37)</span></li>
-<li class="date"><a href="how-to-live-a-more-eco-friendly-life.html" class="text-blue-500 font-semibold">How-to-live-a-more-eco-friendly-life</a> <span class="text-gray-600">(2025-02-08 16:17:08)</span></li>
-<li class="date"><a href="best-plants-for-indoor-spaces.html" class="text-blue-500 font-semibold">Best-plants-for-indoor-spaces</a> <span class="text-gray-600">(2025-02-08 16:16:19)</span></li>
-<li class="date"><a href="simple-home-decor-ideas-that-transform-any-room.html" class="text-blue-500 font-semibold">Simple-home-decor-ideas-that-transform-any-room</a> <span class="text-gray-600">(2025-02-08 16:15:43)</span></li>
-<li class="date"><a href="how-to-organize-your-home-for-maximum-productivity.html" class="text-blue-500 font-semibold">How-to-organize-your-home-for-maximum-productivity</a> <span class="text-gray-600">(2025-02-08 16:15:02)</span></li>
-<li class="date"><a href="how-to-build-high-quality-backlinks.html" class="text-blue-500 font-semibold">How-to-build-high-quality-backlinks</a> <span class="text-gray-600">(2025-02-08 16:14:26)</span></li>
-<li class="date"><a href="on-page-seo-vs.-off-page-seo-key-differences.html" class="text-blue-500 font-semibold">On-page-seo-vs.-off-page-seo-key-differences</a> <span class="text-gray-600">(2025-02-08 16:13:42)</span></li>
-<li class="date"><a href="best-seo-tools-for-bloggers.html" class="text-blue-500 font-semibold">Best-seo-tools-for-bloggers</a> <span class="text-gray-600">(2025-02-08 16:12:42)</span></li>
-<li class="date"><a href="how-to-write-seo-friendly-blog-posts.html" class="text-blue-500 font-semibold">How-to-write-seo-friendly-blog-posts</a> <span class="text-gray-600">(2025-02-08 16:12:09)</span></li>
-<li class="date"><a href="keyword-research-tips-for-beginners.html" class="text-blue-500 font-semibold">Keyword-research-tips-for-beginners</a> <span class="text-gray-600">(2025-02-08 16:11:29)</span></li>
-<li class="date"><a href="the-best-tools-for-remote-teams.html" class="text-blue-500 font-semibold">The-best-tools-for-remote-teams</a> <span class="text-gray-600">(2025-02-08 16:10:50)</span></li>
-<li class="date"><a href="scaling-your-startup-what-you-need-to-know.html" class="text-blue-500 font-semibold">Scaling-your-startup-what-you-need-to-know</a> <span class="text-gray-600">(2025-02-08 16:10:12)</span></li>
-<li class="date"><a href="how-to-create-a-business-plan.html" class="text-blue-500 font-semibold">How-to-create-a-business-plan</a> <span class="text-gray-600">(2025-02-08 16:09:34)</span></li>
-<li class="date"><a href="top-marketing-strategies-for-startups.html" class="text-blue-500 font-semibold">Top-marketing-strategies-for-startups</a> <span class="text-gray-600">(2025-02-08 16:09:08)</span></li>
-<li class="date"><a href="how-to-validate-your-startup-idea.html" class="text-blue-500 font-semibold">How-to-validate-your-startup-idea</a> <span class="text-gray-600">(2025-02-08 16:07:52)</span></li>
-<li class="date"><a href="how-to-set-and-achieve-long-term-goals.html" class="text-blue-500 font-semibold">How-to-set-and-achieve-long-term-goals</a> <span class="text-gray-600">(2025-02-08 16:07:22)</span></li>
-<li class="date"><a href="networking-tips-for-professionals.html" class="text-blue-500 font-semibold">Networking-tips-for-professionals</a> <span class="text-gray-600">(2025-02-08 16:06:55)</span></li>
-<li class="date"><a href="how-to-start-a-successful-freelance-career.html" class="text-blue-500 font-semibold">How-to-start-a-successful-freelance-career</a> <span class="text-gray-600">(2025-02-08 16:06:21)</span></li>
-<li class="date"><a href="how-to-prepare-for-a-job-interview-tips-and-tricks.html" class="text-blue-500 font-semibold">How-to-prepare-for-a-job-interview-tips-and-tricks</a> <span class="text-gray-600">(2025-02-08 16:05:49)</span></li>
-<li class="date"><a href="how-to-plan-for-early-retirement.html" class="text-blue-500 font-semibold">How-to-plan-for-early-retirement</a> <span class="text-gray-600">(2025-02-08 16:03:49)</span></li>
-<li class="date"><a href="common-financial-mistakes-to-avoid-in-your-20s.html" class="text-blue-500 font-semibold">Common-financial-mistakes-to-avoid-in-your-20s</a> <span class="text-gray-600">(2025-02-08 16:03:26)</span></li>
-<li class="date"><a href="the-best-budgeting-apps-in-2025.html" class="text-blue-500 font-semibold">The-best-budgeting-apps-in-2025</a> <span class="text-gray-600">(2025-02-08 16:02:53)</span></li>
-<li class="date"><a href="credit-score-explained-how-to-improve-yours.html" class="text-blue-500 font-semibold">Credit-score-explained-how-to-improve-yours</a> <span class="text-gray-600">(2025-02-08 16:01:54)</span></li>
-<li class="date"><a href="how-to-build-an-emergency-fund.html" class="text-blue-500 font-semibold">How-to-build-an-emergency-fund</a> <span class="text-gray-600">(2025-02-08 16:01:21)</span></li>
-<li class="date"><a href="how-to-improve-sleep-quality-naturally.html" class="text-blue-500 font-semibold">How-to-improve-sleep-quality-naturally</a> <span class="text-gray-600">(2025-02-08 16:00:40)</span></li>
-<li class="date"><a href="the-importance-of-mental-health-and-self-care.html" class="text-blue-500 font-semibold">The-importance-of-mental-health-and-self-care</a> <span class="text-gray-600">(2025-02-08 15:59:45)</span></li>
-<li class="date"><a href="healthy-eating-on-a-budget-easy-tips.html" class="text-blue-500 font-semibold">Healthy-eating-on-a-budget-easy-tips</a> <span class="text-gray-600">(2025-02-08 15:59:06)</span></li>
-<li class="date"><a href="how-to-stay-fit-without-a-gym.html" class="text-blue-500 font-semibold">How-to-stay-fit-without-a-gym</a> <span class="text-gray-600">(2025-02-08 15:58:34)</span></li>
-<li class="date"><a href="the-benefits-of-meditation-and-how-to-get-started.html" class="text-blue-500 font-semibold">The-benefits-of-meditation-and-how-to-get-started</a> <span class="text-gray-600">(2025-02-08 15:57:55)</span></li>
-<li class="date"><a href="benefits-of-learning-a-new-language-and-how-to-start.html" class="text-blue-500 font-semibold">Benefits-of-learning-a-new-language-and-how-to-start</a> <span class="text-gray-600">(2025-02-08 15:57:05)</span></li>
-<li class="date"><a href="study-hacks-to-ace-your-exams.html" class="text-blue-500 font-semibold">Study-hacks-to-ace-your-exams</a> <span class="text-gray-600">(2025-02-08 15:56:26)</span></li>
-<li class="date"><a href="how-to-write-a-perfect-research-paper.html" class="text-blue-500 font-semibold">How-to-write-a-perfect-research-paper</a> <span class="text-gray-600">(2025-02-08 15:55:29)</span></li>
-<li class="date"><a href="best-online-learning-platforms-compared.html" class="text-blue-500 font-semibold">Best-online-learning-platforms-compared</a> <span class="text-gray-600">(2025-02-08 15:54:52)</span></li>
-<li class="date"><a href="how-to-get-free-certifications-from-top-universities.html" class="text-blue-500 font-semibold">How-to-get-free-certifications-from-top-universities</a> <span class="text-gray-600">(2025-02-08 15:54:08)</span></li>
-<li class="date"><a href="how-to-protect-your-privacy-online.html" class="text-blue-500 font-semibold">How-to-protect-your-privacy-online</a> <span class="text-gray-600">(2025-02-08 15:53:15)</span></li>
-<li class="date"><a href="the-future-of-ai-what-you-need-to-know.html" class="text-blue-500 font-semibold">The-future-of-ai-what-you-need-to-know</a> <span class="text-gray-600">(2025-02-08 15:52:19)</span></li>
-<li class="date"><a href="how-to-build-a-personal-website-a-step-by-step-guide.html" class="text-blue-500 font-semibold">How-to-build-a-personal-website-a-step-by-step-guide</a> <span class="text-gray-600">(2025-02-08 15:51:51)</span></li>
-<li class="date"><a href="best-laptops-for-students-and-professionals-in-2025.html" class="text-blue-500 font-semibold">Best-laptops-for-students-and-professionals-in-2025</a> <span class="text-gray-600">(2025-02-08 15:49:51)</span></li>
-<li class="date"><a href="top-10-coding-languages-to-learn-in-2025.html" class="text-blue-500 font-semibold">Top-10-coding-languages-to-learn-in-2025</a> <span class="text-gray-600">(2025-02-08 15:49:01)</span></li>
-<li class="date"><a href="top-social-media-marketing-strategies-for-small-businesses.html" class="text-blue-500 font-semibold">Top-social-media-marketing-strategies-for-small-businesses</a> <span class="text-gray-600">(2025-02-08 15:47:55)</span></li>
-<li class="date"><a href="how-to-optimize-your-blog-posts-for-search-engines.html" class="text-blue-500 font-semibold">How-to-optimize-your-blog-posts-for-search-engines</a> <span class="text-gray-600">(2025-02-08 15:47:12)</span></li>
-<li class="date"><a href="seo-trends-you-can’t-ignore-in-2025.html" class="text-blue-500 font-semibold">Seo-trends-you-can’t-ignore-in-2025</a> <span class="text-gray-600">(2025-02-08 15:46:35)</span></li>
-<li class="date"><a href="10-diy-home-improvement-projects-anyone-can-do.html" class="text-blue-500 font-semibold">10-diy-home-improvement-projects-anyone-can-do</a> <span class="text-gray-600">(2025-02-08 15:45:54)</span></li>
-<li class="date"><a href="how-to-create-a-sustainable-garden.html" class="text-blue-500 font-semibold">How-to-create-a-sustainable-garden</a> <span class="text-gray-600">(2025-02-08 15:45:11)</span></li>
-<li class="date"><a href="home-office-setup-ideas-for-maximum-productivity.html" class="text-blue-500 font-semibold">Home-office-setup-ideas-for-maximum-productivity</a> <span class="text-gray-600">(2025-02-08 15:44:53)</span></li>
-<li class="date"><a href="balancing-work-and-family-life-a-complete-guide.html" class="text-blue-500 font-semibold">Balancing-work-and-family-life-a-complete-guide</a> <span class="text-gray-600">(2025-02-08 15:44:14)</span></li>
-<li class="date"><a href="how-to-build-stronger-relationships-with-your-partner.html" class="text-blue-500 font-semibold">How-to-build-stronger-relationships-with-your-partner</a> <span class="text-gray-600">(2025-02-08 15:43:23)</span></li>
-<li class="date"><a href="10-tips-for-raising-emotionally-intelligent-kids.html" class="text-blue-500 font-semibold">10-tips-for-raising-emotionally-intelligent-kids</a> <span class="text-gray-600">(2025-02-08 15:42:36)</span></li>
-<li class="date"><a href="best-travel-gadgets-you-shouldn’t-leave-home-without.html" class="text-blue-500 font-semibold">Best-travel-gadgets-you-shouldn’t-leave-home-without</a> <span class="text-gray-600">(2025-02-08 15:41:46)</span></li>
-<li class="date"><a href="how-to-travel-on-a-budget-tips-and-tricks.html" class="text-blue-500 font-semibold">How-to-travel-on-a-budget-tips-and-tricks</a> <span class="text-gray-600">(2025-02-08 15:41:09)</span></li>
-<li class="date"><a href="top-travel-destinations-for-solo-travelers.html" class="text-blue-500 font-semibold">Top-travel-destinations-for-solo-travelers</a> <span class="text-gray-600">(2025-02-08 15:40:08)</span></li>
-<li class="date"><a href="time-management-hacks-for-professionals.html" class="text-blue-500 font-semibold">Time-management-hacks-for-professionals</a> <span class="text-gray-600">(2025-02-08 15:38:12)</span></li>
-<li class="date"><a href="minimalism-101-how-to-declutter-your-life.html" class="text-blue-500 font-semibold">Minimalism-101-how-to-declutter-your-life</a> <span class="text-gray-600">(2025-02-08 15:36:57)</span></li>
-<li class="date"><a href="morning-routine-ideas-to-kickstart-a-productive-day.html" class="text-blue-500 font-semibold">Morning-routine-ideas-to-kickstart-a-productive-day</a> <span class="text-gray-600">(2025-02-08 15:36:17)</span></li>
-<li class="date"><a href="10-passive-income-ideas-that-work.html" class="text-blue-500 font-semibold">10-passive-income-ideas-that-work</a> <span class="text-gray-600">(2025-02-08 15:35:34)</span></li>
-<li class="date"><a href="investing-for-beginners-everything-you-need-to-know.html" class="text-blue-500 font-semibold">Investing-for-beginners-everything-you-need-to-know</a> <span class="text-gray-600">(2025-02-08 15:35:11)</span></li>
-<li class="date"><a href="how-to-save-money-on-a-tight-budget.html" class="text-blue-500 font-semibold">How-to-save-money-on-a-tight-budget</a> <span class="text-gray-600">(2025-02-08 15:34:37)</span></li>
-<li class="date"><a href="best-study-techniques-for-students-to-retain-more-information.html" class="text-blue-500 font-semibold">Best-study-techniques-for-students-to-retain-more-information</a> <span class="text-gray-600">(2025-02-08 15:33:58)</span></li>
-<li class="date"><a href="top-10-free-online-courses-from-leading-universities.html" class="text-blue-500 font-semibold">Top-10-free-online-courses-from-leading-universities</a> <span class="text-gray-600">(2025-02-08 15:33:20)</span></li>
-<li class="date"><a href="how-to-boost-your-immune-system-naturally.html" class="text-blue-500 font-semibold">How-to-boost-your-immune-system-naturally</a> <span class="text-gray-600">(2025-02-08 15:32:11)</span></li>
-<li class="date"><a href="10-minute-home-workouts-for-busy-people.html" class="text-blue-500 font-semibold">10-minute-home-workouts-for-busy-people</a> <span class="text-gray-600">(2025-02-08 15:31:26)</span></li>
-<li class="date"><a href="the-ultimate-guide-to-intermittent-fasting.html" class="text-blue-500 font-semibold">The-ultimate-guide-to-intermittent-fasting</a> <span class="text-gray-600">(2025-02-08 15:30:52)</span></li>
-<li class="date"><a href="cloud-storage-vs-external-drives-which-one-is-better?.html" class="text-blue-500 font-semibold">Cloud-storage-vs-external-drives-which-one-is-better?</a> <span class="text-gray-600">(2025-02-08 15:29:52)</span></li>
-<li class="date"><a href="10-must-have-mobile-apps-for-productivity.html" class="text-blue-500 font-semibold">10-must-have-mobile-apps-for-productivity</a> <span class="text-gray-600">(2025-02-08 15:26:12)</span></li>
-<li class="date"><a href="how-to-speed-up-your-smartphone-2025-edition.html" class="text-blue-500 font-semibold">How-to-speed-up-your-smartphone-2025-edition</a> <span class="text-gray-600">(2025-02-08 15:21:20)</span></li>
-      </ul>
+    <section class="search-section">
+      <form method="GET" action="." target="_top">
+        <input type="search" 
+               class="search-box"
+               placeholder="Search articles..."
+               on="input-debounced:AMP.setState({searchQuery: event.value})"
+               [value]="searchQuery">
+      </form>
+      <div class="filters">
+        <button class="filter-btn" [class]="'filter-btn ' + (selectedCategory == 'all' ? 'selected' : '')"
+                on="tap:AMP.setState({selectedCategory: 'all'})">All</button>
+        <button class="filter-btn" [class]="'filter-btn ' + (selectedCategory == 'tech' ? 'selected' : '')"
+                on="tap:AMP.setState({selectedCategory: 'tech'})">Technology</button>
+        <button class="filter-btn" [class]="'filter-btn ' + (selectedCategory == 'business' ? 'selected' : '')"
+                on="tap:AMP.setState({selectedCategory: 'business'})">Business</button>
+        <button class="filter-btn" [class]="'filter-btn ' + (selectedCategory == 'tutorial' ? 'selected' : '')"
+                on="tap:AMP.setState({selectedCategory: 'tutorial'})">Tutorials</button>
+      </div>
+    </section>
+
+    <section class="posts-grid">
+      
+                <article class="post-card">
+                    <a href="journaling-for-self-discovery-a-beginner’s-guide.html" class="post-title">Journaling For Self Discovery A Beginner’S Guide</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="building-healthy-boundaries-in-relationships.html" class="post-title">Building Healthy Boundaries In Relationships</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-overcome-procrastination.html" class="post-title">How To Overcome Procrastination</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="simple-ways-to-boost-your-confidence.html" class="post-title">Simple Ways To Boost Your Confidence</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-improve-communication-in-relationships.html" class="post-title">How To Improve Communication In Relationships</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="essential-travel-apps-you-need-in-2025.html" class="post-title">Essential Travel Apps You Need In 2025</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-find-cheap-flights-every-time.html" class="post-title">How To Find Cheap Flights Every Time</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="top-underrated-travel-destinations.html" class="post-title">Top Underrated Travel Destinations</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-pack-light-for-any-trip.html" class="post-title">How To Pack Light For Any Trip</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="best-travel-insurance-for-international-trips.html" class="post-title">Best Travel Insurance For International Trips</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="cleaning-hacks-for-busy-people.html" class="post-title">Cleaning Hacks For Busy People</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-live-a-more-eco-friendly-life.html" class="post-title">How To Live A More Eco Friendly Life</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="best-plants-for-indoor-spaces.html" class="post-title">Best Plants For Indoor Spaces</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="simple-home-decor-ideas-that-transform-any-room.html" class="post-title">Simple Home Decor Ideas That Transform Any Room</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-organize-your-home-for-maximum-productivity.html" class="post-title">How To Organize Your Home For Maximum Productivity</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-build-high-quality-backlinks.html" class="post-title">How To Build High Quality Backlinks</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="on-page-seo-vs.-off-page-seo-key-differences.html" class="post-title">On Page Seo Vs. Off Page Seo Key Differences</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="best-seo-tools-for-bloggers.html" class="post-title">Best Seo Tools For Bloggers</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-write-seo-friendly-blog-posts.html" class="post-title">How To Write Seo Friendly Blog Posts</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="keyword-research-tips-for-beginners.html" class="post-title">Keyword Research Tips For Beginners</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="the-best-tools-for-remote-teams.html" class="post-title">The Best Tools For Remote Teams</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="scaling-your-startup-what-you-need-to-know.html" class="post-title">Scaling Your Startup What You Need To Know</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-create-a-business-plan.html" class="post-title">How To Create A Business Plan</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="top-marketing-strategies-for-startups.html" class="post-title">Top Marketing Strategies For Startups</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-validate-your-startup-idea.html" class="post-title">How To Validate Your Startup Idea</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-set-and-achieve-long-term-goals.html" class="post-title">How To Set And Achieve Long Term Goals</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="networking-tips-for-professionals.html" class="post-title">Networking Tips For Professionals</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-start-a-successful-freelance-career.html" class="post-title">How To Start A Successful Freelance Career</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-prepare-for-a-job-interview-tips-and-tricks.html" class="post-title">How To Prepare For A Job Interview Tips And Tricks</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-plan-for-early-retirement.html" class="post-title">How To Plan For Early Retirement</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="common-financial-mistakes-to-avoid-in-your-20s.html" class="post-title">Common Financial Mistakes To Avoid In Your 20S</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="the-best-budgeting-apps-in-2025.html" class="post-title">The Best Budgeting Apps In 2025</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="credit-score-explained-how-to-improve-yours.html" class="post-title">Credit Score Explained How To Improve Yours</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-build-an-emergency-fund.html" class="post-title">How To Build An Emergency Fund</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-improve-sleep-quality-naturally.html" class="post-title">How To Improve Sleep Quality Naturally</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="the-importance-of-mental-health-and-self-care.html" class="post-title">The Importance Of Mental Health And Self Care</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="healthy-eating-on-a-budget-easy-tips.html" class="post-title">Healthy Eating On A Budget Easy Tips</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-stay-fit-without-a-gym.html" class="post-title">How To Stay Fit Without A Gym</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="the-benefits-of-meditation-and-how-to-get-started.html" class="post-title">The Benefits Of Meditation And How To Get Started</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="benefits-of-learning-a-new-language-and-how-to-start.html" class="post-title">Benefits Of Learning A New Language And How To Start</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="study-hacks-to-ace-your-exams.html" class="post-title">Study Hacks To Ace Your Exams</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-write-a-perfect-research-paper.html" class="post-title">How To Write A Perfect Research Paper</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="best-online-learning-platforms-compared.html" class="post-title">Best Online Learning Platforms Compared</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-get-free-certifications-from-top-universities.html" class="post-title">How To Get Free Certifications From Top Universities</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-protect-your-privacy-online.html" class="post-title">How To Protect Your Privacy Online</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="the-future-of-ai-what-you-need-to-know.html" class="post-title">The Future Of Ai What You Need To Know</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-build-a-personal-website-a-step-by-step-guide.html" class="post-title">How To Build A Personal Website A Step By Step Guide</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="best-laptops-for-students-and-professionals-in-2025.html" class="post-title">Best Laptops For Students And Professionals In 2025</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="top-10-coding-languages-to-learn-in-2025.html" class="post-title">Top 10 Coding Languages To Learn In 2025</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="top-social-media-marketing-strategies-for-small-businesses.html" class="post-title">Top Social Media Marketing Strategies For Small Businesses</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-optimize-your-blog-posts-for-search-engines.html" class="post-title">How To Optimize Your Blog Posts For Search Engines</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="seo-trends-you-can’t-ignore-in-2025.html" class="post-title">Seo Trends You Can’T Ignore In 2025</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="10-diy-home-improvement-projects-anyone-can-do.html" class="post-title">10 Diy Home Improvement Projects Anyone Can Do</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-create-a-sustainable-garden.html" class="post-title">How To Create A Sustainable Garden</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="home-office-setup-ideas-for-maximum-productivity.html" class="post-title">Home Office Setup Ideas For Maximum Productivity</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="balancing-work-and-family-life-a-complete-guide.html" class="post-title">Balancing Work And Family Life A Complete Guide</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-build-stronger-relationships-with-your-partner.html" class="post-title">How To Build Stronger Relationships With Your Partner</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="10-tips-for-raising-emotionally-intelligent-kids.html" class="post-title">10 Tips For Raising Emotionally Intelligent Kids</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="best-travel-gadgets-you-shouldn’t-leave-home-without.html" class="post-title">Best Travel Gadgets You Shouldn’T Leave Home Without</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-travel-on-a-budget-tips-and-tricks.html" class="post-title">How To Travel On A Budget Tips And Tricks</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="top-travel-destinations-for-solo-travelers.html" class="post-title">Top Travel Destinations For Solo Travelers</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="time-management-hacks-for-professionals.html" class="post-title">Time Management Hacks For Professionals</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="minimalism-101-how-to-declutter-your-life.html" class="post-title">Minimalism 101 How To Declutter Your Life</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="morning-routine-ideas-to-kickstart-a-productive-day.html" class="post-title">Morning Routine Ideas To Kickstart A Productive Day</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="10-passive-income-ideas-that-work.html" class="post-title">10 Passive Income Ideas That Work</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="investing-for-beginners-everything-you-need-to-know.html" class="post-title">Investing For Beginners Everything You Need To Know</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-save-money-on-a-tight-budget.html" class="post-title">How To Save Money On A Tight Budget</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="best-study-techniques-for-students-to-retain-more-information.html" class="post-title">Best Study Techniques For Students To Retain More Information</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="top-10-free-online-courses-from-leading-universities.html" class="post-title">Top 10 Free Online Courses From Leading Universities</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-boost-your-immune-system-naturally.html" class="post-title">How To Boost Your Immune System Naturally</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="10-minute-home-workouts-for-busy-people.html" class="post-title">10 Minute Home Workouts For Busy People</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="the-ultimate-guide-to-intermittent-fasting.html" class="post-title">The Ultimate Guide To Intermittent Fasting</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="cloud-storage-vs-external-drives-which-one-is-better?.html" class="post-title">Cloud Storage Vs External Drives Which One Is Better?</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="10-must-have-mobile-apps-for-productivity.html" class="post-title">10 Must Have Mobile Apps For Productivity</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
+
+                <article class="post-card">
+                    <a href="how-to-speed-up-your-smartphone-2025-edition.html" class="post-title">How To Speed Up Your Smartphone 2025 Edition</a>
+                    <div class="post-meta">
+                        <span>Published: 2025-02-08</span>
+                    </div>
+                </article>
+            
     </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="card">
+  <footer>
     <p>&copy; 2025 News Flash. All rights reserved.</p>
+    <nav>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/rss">RSS Feed</a>
+    </nav>
   </footer>
 
 </body>
