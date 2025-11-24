@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.luckyrathore.newsflash',
+  appId: 'com.newsflash.app',
   appName: 'News Flash',
   webDir: 'build'
 };

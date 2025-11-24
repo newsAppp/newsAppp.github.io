@@ -12,8 +12,8 @@ const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
         value={selectedCategory}
         onChange={(e) => onCategoryChange(e.target.value)}
       >
-        {categories.map((category) => (
-          <MenuItem key={category} value={category}>
+        {categories.map((category, i) => (
+          <MenuItem key={i} value={category}>
             {category}
           </MenuItem>
         ))}

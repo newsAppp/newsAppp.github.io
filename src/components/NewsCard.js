@@ -19,10 +19,11 @@ const NewsCard = ({ news, isHindi }) => {
 
   const getImageUrl = (imageJson) => {
     try {
-      const jsonString = imageJson.replace(/'/g, '"');
-      let url = JSON.parse(jsonString)['identifier'];
-      console.log(url);
-      return url;
+      if(JSON.isRawJSON(imageJson)){
+        const jsonString = imageJson.replace(/'/g, '"');
+        let url = JSON.parse(jsonString)['identifier'];
+        return url;
+      }      
     } catch (error) {
       console.info('Error parsing image JSON:', error);
     }

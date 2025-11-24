@@ -25,17 +25,10 @@ function AppAppBar({ mode, toggleColorMode, handleCategoryChange, isHindi, setIs
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);
-  const [categories, setCategories] = React.useState([]);
+  const categories =
+    [{ "section": ["national", "elections", "assembly-elections"], "label": "National & Politics", "labelhindi": "राष्ट्रीय और राजनीति", "url": "national-and-politics" }, { "section": ["international"], "label": "International", "labelhindi": "अंतर्राष्ट्रीय", "url": "international" }, { "section": ["business", "economy", "markets", "industry", "budget"], "label": "Business & Economy", "labelhindi": "व्यवसाय और अर्थव्यवस्था", "url": "business-and-economy" }, { "section": ["science", "technology", "sci-tech", "energy-and-environment"], "label": "Science & Technology", "labelhindi": "विज्ञान और तकनीक", "url": "science-and-technology" }, { "section": ["sports", "cricket", "football", "tennis", "olympics", "athletics", "hockey", "motorsport", "races-other-sports"], "label": "Sports", "labelhindi": "खेल", "url": "sports" }, { "section": ["entertainment", "movies", "music", "theatre-dance", "fashion-art", "life-and-style", "travel", "homes-and-gardens", "food-dining"], "label": "Entertainment & Lifestyle", "labelhindi": "मनोरंजन और जीवन शैली", "url": "entertainment-and-lifestyle" }, { "section": ["health", "society", "history-and-culture", "agriculture"], "label": "Health & Society", "labelhindi": "स्वास्थ्य और समाज", "url": "health-and-society" }]
 
-  React.useEffect(() => {
-    getCategoriesV2().then(d => {
-      d= d.filter(a => a['label'] !== 'Top 30')
-      setCategories(
-      d
-      )
-      console.log(d);
-    })
-  }, []);
+  ;
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -241,8 +234,8 @@ function AppAppBar({ mode, toggleColorMode, handleCategoryChange, isHindi, setIs
                     </Link>
                   </Box>
                   <Divider />
-                  {categories.map((item) => (
-                    <MenuItem key={item.section} onClick={() => scrollToSection(item.section)}>
+                  {categories.map((item, i) => (
+                    <MenuItem key={i} onClick={() => scrollToSection(item.section)}>
                       {isHindi ? item.labelhindi : item.label}
                     </MenuItem>
                   ))}

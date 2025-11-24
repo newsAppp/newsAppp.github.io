@@ -1,4 +1,4 @@
-package com.luckyrathore.newsflash;
+package com.newsflash.app;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -4,6 +4,7 @@ import NewsCard from './NewsCard';
 import { fetchNews } from '../api';
 
 const NewsList = ({ selectedCategory, isHindi }) => {
+  console.log('selectedCategory 2', selectedCategory)
   const [newsList, setNewsList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(6);
@@ -18,6 +19,9 @@ const NewsList = ({ selectedCategory, isHindi }) => {
 
     setIsLoading(true);
     try {
+      
+      console.log('selectedCategory 3', selectedCategory)
+
       const data = await fetchNews(selectedCategory, page, perPage);
 
       // Filter out duplicates based on article_id
@@ -83,7 +87,7 @@ const NewsList = ({ selectedCategory, isHindi }) => {
             xs={12}
             sm={6}
             md={4}
-            key={news.article_id}
+            key={index}
             ref={index === newsList.length - 1 ? lastNewsElementRef : null}
           >
             <NewsCard news={news} isHindi={isHindi} />

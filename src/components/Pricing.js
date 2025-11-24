@@ -85,10 +85,10 @@ export default function Pricing() {
         </Typography>
       </Box>
       <Grid container spacing={3} alignItems="center" justifyContent="center">
-        {tiers.map((tier) => (
+        {tiers.map((tier, i) => (
           <Grid
             item
-            key={tier.title}
+            key={i}
             xs={12}
             sm={tier.title === 'Enterprise' ? 12 : 6}
             md={4}
@@ -161,9 +161,9 @@ export default function Pricing() {
                     borderColor: 'grey.500',
                   }}
                 />
-                {tier.description.map((line) => (
+                {tier.description.map((line, i) => (
                   <Box
-                    key={line}
+                    key={i}
                     sx={{
                       py: 1,
                       display: 'flex',

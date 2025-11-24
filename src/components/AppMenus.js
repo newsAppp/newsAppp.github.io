@@ -8,17 +8,20 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 function AppMenus({ menuItems, scrollToSection, handleMenuOpen, handleMenuClose, anchorEl, isMenuOpen, isHindi }) {
   const MAX_ITEMS = 3;
+  const menuItems2 = [  { "section": ["national", "elections", "assembly-elections"], "label": "National & Politics", "labelhindi": "राष्ट्रीय और राजनीति", "url": "national-and-politics" }, { "section": ["international"], "label": "International",  "labelhindi": "अंतर्राष्ट्रीय", "url": "international"  }, { "section": ["business", "economy", "markets", "industry", "budget"], "label": "Business & Economy", "labelhindi": "व्यवसाय और अर्थव्यवस्था", "url": "business-and-economy" }, { "section": ["science", "technology", "sci-tech", "energy-and-environment"], "label": "Science & Technology", "labelhindi": "विज्ञान और तकनीक", "url": "science-and-technology"   }, { "section": ["sports", "cricket", "football", "tennis", "olympics", "athletics", "hockey", "motorsport", "races-other-sports"], "label": "Sports", "labelhindi": "खेल", "url": "sports"   }, { "section": ["entertainment", "movies", "music", "theatre-dance", "fashion-art", "life-and-style", "travel", "homes-and-gardens", "food-dining"], "label": "Entertainment & Lifestyle", "labelhindi": "मनोरंजन और जीवन शैली", "url": "entertainment-and-lifestyle" }, { "section": ["health", "society", "history-and-culture", "agriculture"], "label": "Health & Society", "labelhindi": "स्वास्थ्य और समाज", "url": "health-and-society" } ]
 
-  const mainItems = menuItems.slice(0, MAX_ITEMS);
-  const moreItems = menuItems.slice(MAX_ITEMS);
-  console.log(isHindi)
+
+  const mainItems = menuItems2.slice(0, MAX_ITEMS);
+  const moreItems = menuItems2.slice(MAX_ITEMS);
 
   return (
     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-      {mainItems.map((item) => (
+      {mainItems.map((item, index) => (
         <MenuItem
-          key={item.section}
-          onClick={() => scrollToSection(item.section)}
+          key={index}
+          onClick={() => {
+            scrollToSection(item.section)
+          }}
           sx={{ py: '6px', px: '12px' }}
         >
           <Typography variant="body2" color="text.primary">
@@ -52,9 +55,9 @@ function AppMenus({ menuItems, scrollToSection, handleMenuOpen, handleMenuClose,
           },
         }}
       >
-        {moreItems.map((item) => (
+        {moreItems.map((item, index) => (
           <MenuItem
-            key={item.section}
+            key={index}
             onClick={() => {
               scrollToSection(item.section);
               handleMenuClose();

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -59,7 +58,7 @@ export default function LandingPage() {
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const LPtheme = createTheme(getLPTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
-  const [selectedCategory, setSelectedCategory] = React.useState('national'); 
+  const [selectedCategory, setSelectedCategory] = React.useState('top30'); 
   const [isHindi, setIsHindi] = React.useState(false);
 
   const toggleColorMode = () => {
@@ -67,7 +66,7 @@ export default function LandingPage() {
   };
 
   const handleCategoryChange = (category) => {
-    console.log('handleCategoryChange', category)
+    console.log('selectedCategory', category)
     setSelectedCategory(category);
   };
 
