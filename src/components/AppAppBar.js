@@ -11,8 +11,10 @@ import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import ToggleColorMode from './ToggleColorMode';
 import AppMenus from './AppMenus'; // Import the new component
-import { Divider } from '@mui/material';
+import { Badge, Divider, Typography } from '@mui/material';
+import { Bookmark } from '@mui/icons-material';
 import { getCategoriesV2 } from '../api';
+import { getBookmarkCount } from '../utils/bookmarkUtils';
 import { Link } from 'react-router-dom';
 
 const logoStyle = {
@@ -24,11 +26,12 @@ const logoStyle = {
 function AppAppBar({ mode, toggleColorMode, handleCategoryChange, isHindi, setIsHindi }) {
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [bookmarkCount, setBookmarkCount] = React.useState(0);
   const isMenuOpen = Boolean(anchorEl);
   const categories =
     [{ "section": ["national", "elections", "assembly-elections"], "label": "National & Politics", "labelhindi": "राष्ट्रीय और राजनीति", "url": "national-and-politics" }, { "section": ["international"], "label": "International", "labelhindi": "अंतर्राष्ट्रीय", "url": "international" }, { "section": ["business", "economy", "markets", "industry", "budget"], "label": "Business & Economy", "labelhindi": "व्यवसाय और अर्थव्यवस्था", "url": "business-and-economy" }, { "section": ["science", "technology", "sci-tech", "energy-and-environment"], "label": "Science & Technology", "labelhindi": "विज्ञान और तकनीक", "url": "science-and-technology" }, { "section": ["sports", "cricket", "football", "tennis", "olympics", "athletics", "hockey", "motorsport", "races-other-sports"], "label": "Sports", "labelhindi": "खेल", "url": "sports" }, { "section": ["entertainment", "movies", "music", "theatre-dance", "fashion-art", "life-and-style", "travel", "homes-and-gardens", "food-dining"], "label": "Entertainment & Lifestyle", "labelhindi": "मनोरंजन और जीवन शैली", "url": "entertainment-and-lifestyle" }, { "section": ["health", "society", "history-and-culture", "agriculture"], "label": "Health & Society", "labelhindi": "स्वास्थ्य और समाज", "url": "health-and-society" }]
 
-  ;
+    ;
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -56,6 +59,14 @@ function AppAppBar({ mode, toggleColorMode, handleCategoryChange, isHindi, setIs
       setOpen(false);
     }
   };
+
+  // Update bookmark count
+  React.useEffect(() => {
+    const updateCount = () => setBookmarkCount(getBookmarkCount());
+    updateCount();
+    const interval = setInterval(updateCount, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div>
@@ -233,6 +244,24 @@ function AppAppBar({ mode, toggleColorMode, handleCategoryChange, isHindi, setIs
                       </Button>
                     </Link>
                   </Box>
+                  <Divider />
+                  {/* Bookmarks Option */}
+                  <MenuItem
+                    onClick={() => scrollToSection('bookmarks')}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      py: 1.5
+                    }}
+                  >
+                    <Badge badgeContent={bookmarkCount} color="primary">
+                      <Bookmark color="primary" />
+                    </Badge>
+                    <Typography variant="body1">
+                      {isHindi ? 'बुकमार्क' : 'Bookmarks'}
+                    </Typography>
+                  </MenuItem>
                   <Divider />
                   {categories.map((item, i) => (
                     <MenuItem key={i} onClick={() => scrollToSection(item.section)}>

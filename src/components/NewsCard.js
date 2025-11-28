@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, CardMedia, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Card, CardContent, Typography, CardMedia, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip, Box } from '@mui/material';
+import { Bookmark, BookmarkBorder } from '@mui/icons-material';
 import OGContentList from './OGContentList';
 import { getSimilarV2 } from '../api';
+import { isBookmarked, toggleBookmark } from '../utils/bookmarkUtils';
 
-const NewsCard = ({ news, isHindi }) => {
+const NewsCard = ({ news, isHindi, onBookmarkChange }) => {
 
   const [open, setOpen] = useState(false);
   const [similarUrls, setSimilarUrls] = useState([]);
   const [imageError, setImageError] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -35,6 +38,22 @@ const NewsCard = ({ news, isHindi }) => {
     setImageError(true);
   };
 
+  const handleBookmarkToggle = (e) => {
+    e.stopPropagation(); // Prevent opening the dialog
+    const newBookmarkState = toggleBookmark(news.article_id, news);
+    setBookmarked(newBookmarkState);
+
+    // Notify parent component if callback provided
+    if (onBookmarkChange) {
+      onBookmarkChange(news.article_id, newBookmarkState);
+    }
+  };
+
+  // Initialize bookmark state
+  useEffect(() => {
+    setBookmarked(isBookmarked(news.article_id));
+  }, [news.article_id]);
+
   useEffect(() => {
     const fetchSimilarUrls = async () => {
       try {
@@ -54,7 +73,46 @@ const NewsCard = ({ news, isHindi }) => {
 
   return (
     <div>
-      <Card onClick={handleClickOpen}>
+      <Card
+        onClick={handleClickOpen}
+        sx={{
+          position: 'relative',
+          cursor: 'pointer',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: 4,
+          }
+        }}
+      >
+        {/* Bookmark Button */}
+        <Tooltip title={bookmarked ? "Remove bookmark" : "Bookmark"}>
+          <IconButton
+            onClick={handleBookmarkToggle}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              zIndex: 1,
+              transition: 'all 0.3s',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 1)',
+                transform: 'scale(1.15)',
+              },
+              '&:active': {
+                transform: 'scale(0.95)',
+              }
+            }}
+          >
+            {bookmarked ? (
+              <Bookmark sx={{ color: 'primary.main' }} />
+            ) : (
+              <BookmarkBorder sx={{ color: 'text.secondary' }} />
+            )}
+          </IconButton>
+        </Tooltip>
+
         {news.image_loc && !imageError ? (
           <CardMedia
             component="img"

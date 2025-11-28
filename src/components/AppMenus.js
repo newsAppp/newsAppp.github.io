@@ -4,18 +4,56 @@ import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
+import Badge from '@mui/material/Badge';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import { getBookmarkCount } from '../utils/bookmarkUtils';
 
 function AppMenus({ menuItems, scrollToSection, handleMenuOpen, handleMenuClose, anchorEl, isMenuOpen, isHindi }) {
   const MAX_ITEMS = 3;
-  const menuItems2 = [  { "section": ["national", "elections", "assembly-elections"], "label": "National & Politics", "labelhindi": "राष्ट्रीय और राजनीति", "url": "national-and-politics" }, { "section": ["international"], "label": "International",  "labelhindi": "अंतर्राष्ट्रीय", "url": "international"  }, { "section": ["business", "economy", "markets", "industry", "budget"], "label": "Business & Economy", "labelhindi": "व्यवसाय और अर्थव्यवस्था", "url": "business-and-economy" }, { "section": ["science", "technology", "sci-tech", "energy-and-environment"], "label": "Science & Technology", "labelhindi": "विज्ञान और तकनीक", "url": "science-and-technology"   }, { "section": ["sports", "cricket", "football", "tennis", "olympics", "athletics", "hockey", "motorsport", "races-other-sports"], "label": "Sports", "labelhindi": "खेल", "url": "sports"   }, { "section": ["entertainment", "movies", "music", "theatre-dance", "fashion-art", "life-and-style", "travel", "homes-and-gardens", "food-dining"], "label": "Entertainment & Lifestyle", "labelhindi": "मनोरंजन और जीवन शैली", "url": "entertainment-and-lifestyle" }, { "section": ["health", "society", "history-and-culture", "agriculture"], "label": "Health & Society", "labelhindi": "स्वास्थ्य और समाज", "url": "health-and-society" } ]
+  const menuItems2 = [{ "section": ["national", "elections", "assembly-elections"], "label": "National & Politics", "labelhindi": "राष्ट्रीय और राजनीति", "url": "national-and-politics" }, { "section": ["international"], "label": "International", "labelhindi": "अंतर्राष्ट्रीय", "url": "international" }, { "section": ["business", "economy", "markets", "industry", "budget"], "label": "Business & Economy", "labelhindi": "व्यवसाय और अर्थव्यवस्था", "url": "business-and-economy" }, { "section": ["science", "technology", "sci-tech", "energy-and-environment"], "label": "Science & Technology", "labelhindi": "विज्ञान और तकनीक", "url": "science-and-technology" }, { "section": ["sports", "cricket", "football", "tennis", "olympics", "athletics", "hockey", "motorsport", "races-other-sports"], "label": "Sports", "labelhindi": "खेल", "url": "sports" }, { "section": ["entertainment", "movies", "music", "theatre-dance", "fashion-art", "life-and-style", "travel", "homes-and-gardens", "food-dining"], "label": "Entertainment & Lifestyle", "labelhindi": "मनोरंजन और जीवन शैली", "url": "entertainment-and-lifestyle" }, { "section": ["health", "society", "history-and-culture", "agriculture"], "label": "Health & Society", "labelhindi": "स्वास्थ्य और समाज", "url": "health-and-society" }]
 
+  const [bookmarkCount, setBookmarkCount] = React.useState(0);
+
+  // Update bookmark count on component mount and periodically
+  React.useEffect(() => {
+    const updateCount = () => setBookmarkCount(getBookmarkCount());
+    updateCount();
+
+    // Listen for storage events (updates from other tabs)
+    window.addEventListener('storage', updateCount);
+
+    // Poll for updates every 2 seconds
+    const interval = setInterval(updateCount, 2000);
+
+    return () => {
+      window.removeEventListener('storage', updateCount);
+      clearInterval(interval);
+    };
+  }, []);
 
   const mainItems = menuItems2.slice(0, MAX_ITEMS);
   const moreItems = menuItems2.slice(MAX_ITEMS);
 
   return (
     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+      {/* Bookmarks Menu Item */}
+      <MenuItem
+        onClick={() => scrollToSection('bookmarks')}
+        sx={{ py: '6px', px: '12px' }}
+      >
+        <Badge
+          badgeContent={bookmarkCount}
+          color="primary"
+          sx={{ mr: 1 }}
+        >
+          <BookmarkIcon sx={{ fontSize: 20, color: 'text.primary' }} />
+        </Badge>
+        <Typography variant="body2" color="text.primary">
+          {isHindi ? 'बुकमार्क' : 'Bookmarks'}
+        </Typography>
+      </MenuItem>
+
       {mainItems.map((item, index) => (
         <MenuItem
           key={index}
@@ -32,7 +70,7 @@ function AppMenus({ menuItems, scrollToSection, handleMenuOpen, handleMenuClose,
       {moreItems.length > 0 && (
         <MenuItem onClick={handleMenuOpen} sx={{ py: '6px', px: '12px' }}>
           <Typography variant="body2" color="text.primary">
-            { isHindi ? 'अन्य' : 'More' }
+            {isHindi ? 'अन्य' : 'More'}
           </Typography>
           <ExpandMoreIcon />
         </MenuItem>

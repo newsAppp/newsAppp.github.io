@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Grid, CircularProgress, Box } from '@mui/material';
+import { Container, Grid, CircularProgress, Box, Typography } from '@mui/material';
+import { BookmarkBorder } from '@mui/icons-material';
 import NewsCard from './NewsCard';
 import { fetchNews } from '../api';
+import { getBookmarkedArticles } from '../utils/bookmarkUtils';
 
 const NewsList = ({ selectedCategory, isHindi }) => {
   console.log('selectedCategory 2', selectedCategory)
@@ -10,16 +12,27 @@ const NewsList = ({ selectedCategory, isHindi }) => {
   const [perPage] = useState(6);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [bookmarkRefresh, setBookmarkRefresh] = useState(0);
 
   const observer = useRef();
   const lastNewsElementRef = useRef(null);
 
   const loadNews = async (page, isInitialLoad = false) => {
+    // Handle bookmarks view
+    if (selectedCategory === 'bookmarks') {
+      setIsLoading(true);
+      const bookmarkedArticles = getBookmarkedArticles();
+      setNewsList(bookmarkedArticles.reverse()); // Show newest bookmarks first
+      setHasMore(false); // No pagination for bookmarks
+      setIsLoading(false);
+      return;
+    }
+
     if (isLoading || (!hasMore && !isInitialLoad)) return;
 
     setIsLoading(true);
     try {
-      
+
       console.log('selectedCategory 3', selectedCategory)
 
       const data = await fetchNews(selectedCategory, page, perPage);
@@ -41,6 +54,13 @@ const NewsList = ({ selectedCategory, isHindi }) => {
     }
   };
 
+  const handleBookmarkChange = () => {
+    // Refresh bookmarks view when a bookmark is toggled
+    if (selectedCategory === 'bookmarks') {
+      setBookmarkRefresh(prev => prev + 1);
+    }
+  };
+
   useEffect(() => {
     // Reset state and load the first page when category changes
     setNewsList([]);
@@ -48,6 +68,13 @@ const NewsList = ({ selectedCategory, isHindi }) => {
     setHasMore(true);
     loadNews(1, true);  // Initial load for new category
   }, [selectedCategory]);
+
+  useEffect(() => {
+    // Reload bookmarks when bookmarkRefresh changes
+    if (selectedCategory === 'bookmarks') {
+      loadNews(1, true);
+    }
+  }, [bookmarkRefresh]);
 
   useEffect(() => {
     if (currentPage > 1) {
@@ -90,10 +117,34 @@ const NewsList = ({ selectedCategory, isHindi }) => {
             key={index}
             ref={index === newsList.length - 1 ? lastNewsElementRef : null}
           >
-            <NewsCard news={news} isHindi={isHindi} />
+            <NewsCard
+              news={news}
+              isHindi={isHindi}
+              onBookmarkChange={handleBookmarkChange}
+            />
           </Grid>
         ))}
       </Grid>
+
+      {/* Empty state for bookmarks */}
+      {selectedCategory === 'bookmarks' && newsList.length === 0 && !isLoading && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          sx={{ mt: 8, mb: 8 }}
+        >
+          <BookmarkBorder sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+          <Typography variant="h5" color="text.secondary" gutterBottom>
+            No bookmarked articles yet
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Bookmark articles to read them later
+          </Typography>
+        </Box>
+      )}
+
       {isLoading && (
         <Box display="flex" justifyContent="center" alignItems="center" sx={{ mt: 2 }}>
           <CircularProgress />
