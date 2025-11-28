@@ -9,6 +9,7 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import AppAppBar from './components/AppAppBar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
+import NotificationPrompt from './components/NotificationPrompt';
 import getLPTheme from './getLPTheme';
 
 function ToggleCustomTheme({ showCustomTheme, toggleCustomTheme }) {
@@ -58,7 +59,7 @@ export default function LandingPage() {
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const LPtheme = createTheme(getLPTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
-  const [selectedCategory, setSelectedCategory] = React.useState('top30'); 
+  const [selectedCategory, setSelectedCategory] = React.useState('top30');
   const [isHindi, setIsHindi] = React.useState(false);
 
   const toggleColorMode = () => {
@@ -78,6 +79,7 @@ export default function LandingPage() {
       <Box sx={{ bgcolor: 'background.default' }}>
         <Footer />
       </Box>
+      <NotificationPrompt />
     </ThemeProvider>
   );
 }
