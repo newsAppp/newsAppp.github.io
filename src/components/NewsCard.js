@@ -3,8 +3,8 @@ import { Card, CardContent, Typography, CardMedia, Button, Dialog, DialogTitle, 
 import OGContentList from './OGContentList';
 import { getSimilarV2 } from '../api';
 
-const NewsCard = ({ news, isHindi }) => { 
-  
+const NewsCard = ({ news, isHindi }) => {
+
   const [open, setOpen] = useState(false);
   const [similarUrls, setSimilarUrls] = useState([]);
   const [imageError, setImageError] = useState(false);
@@ -19,11 +19,12 @@ const NewsCard = ({ news, isHindi }) => {
 
   const getImageUrl = (imageJson) => {
     try {
-      if(JSON.isRawJSON(imageJson)){
-        const jsonString = imageJson.replace(/'/g, '"');
-        let url = JSON.parse(jsonString)['identifier'];
-        return url;
-      }      
+      const jsonString = imageJson.replace(/'/g, '"');
+      let url = JSON.parse(jsonString)['identifier'];
+      if (url == 'https://www.thehindu.com/theme/images/og-image.png') {
+        return '/logo/vector/default.svg';
+      }
+      return url;
     } catch (error) {
       console.info('Error parsing image JSON:', error);
     }
