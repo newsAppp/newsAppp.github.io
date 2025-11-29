@@ -172,7 +172,7 @@ const NotificationPrompt = () => {
                                     color: 'primary.secondary',
                                     fontWeight: 'bold',
                                     '&:hover': {
-                                        bgcolor: 'rgba(34, 168, 16, 0.9)'
+                                        bgcolor: 'rgba(137, 240, 123, 0.9)'
                                     }
                                 }}
                             >

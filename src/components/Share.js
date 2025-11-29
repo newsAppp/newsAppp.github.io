@@ -1,21 +1,31 @@
 import React, { useState } from 'react';
-import { 
-  IconButton, 
-  Popover, 
-  Box, 
-  Typography, 
-  Button, 
+import {
+  IconButton,
+  Popover,
+  Box,
+  Typography,
+  Button,
   Snackbar,
-  Fade
+  Fade,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+  Alert
 } from '@mui/material';
-import { 
-  Facebook, 
-  Twitter, 
-  LinkedIn, 
-  Email, 
-  Share as ShareIcon, 
-  ContentCopy 
+import {
+  Facebook,
+  Twitter,
+  LinkedIn,
+  Email,
+  Share as ShareIcon,
+  ContentCopy,
+  Image as ImageIcon,
+  Download,
+  IosShare
 } from '@mui/icons-material';
+import { handleShareAsImage, canUseWebShareAPI } from '../utils/shareUtils';
 
 const ShareButton = ({ icon: Icon, color, label, onClick }) => (
   <IconButton
@@ -37,9 +47,14 @@ const ShareButton = ({ icon: Icon, color, label, onClick }) => (
   </IconButton>
 );
 
-const Share = ({ url, title }) => {
+const Share = ({ url, title, news, isHindi = false, open: externalOpen, anchorEl: externalAnchorEl, onClose: externalOnClose }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [generatedCanvas, setGeneratedCanvas] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState(null);
 
   const shareUrl = encodeURIComponent(url);
   const shareTitle = encodeURIComponent(title);
@@ -51,12 +66,22 @@ const Share = ({ url, title }) => {
     email: `mailto:?subject=${shareTitle}&body=Check this out: ${shareUrl}`
   };
 
+  // Use external props if provided, otherwise use internal state
+  const isOpen = externalOpen !== undefined ? externalOpen : Boolean(anchorEl);
+  const currentAnchorEl = externalAnchorEl !== undefined ? externalAnchorEl : anchorEl;
+
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+    if (externalOpen === undefined) {
+      setAnchorEl(event.currentTarget);
+    }
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    if (externalOnClose) {
+      externalOnClose();
+    } else {
+      setAnchorEl(null);
+    }
   };
 
   const handleShare = (platform) => {
@@ -66,50 +91,85 @@ const Share = ({ url, title }) => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(url);
-    setSnackbarOpen(true);
+    showSnackbar('Link copied to clipboard');
     handleClose();
   };
 
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
+  const handleGenerateImage = async () => {
+    if (!news) {
+      showSnackbar('Unable to generate image for this content');
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+    handleClose(); // Close the share popover
+
+    try {
+      // Import the function
+      const { generateNewsCardImage } = require('../utils/shareUtils');
+
+      // Generate canvas for preview
+      const canvas = await generateNewsCardImage(news, isHindi);
+
+      // Convert canvas to data URL for preview
+      const dataUrl = canvas.toDataURL('image/png', 0.92);
+      setGeneratedCanvas({ canvas, dataUrl });
+      setImageDialogOpen(true);
+    } catch (err) {
+      console.error('Error generating image:', err);
+      setError(err.message || 'Failed to generate image');
+      showSnackbar('Failed to generate image. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleShareImage = async () => {
+    if (!generatedCanvas) return;
+
+    try {
+      const { downloadImage, shareImageViaWebShareAPI, generateFilename } = require('../utils/shareUtils');
+      const titleText = isHindi ? news.titlehindi : news.title;
+      const filename = generateFilename(titleText, isHindi);
+
+      if (canUseWebShareAPI()) {
+        // Mobile - use Web Share API
+        await shareImageViaWebShareAPI(generatedCanvas.canvas, titleText);
+        setImageDialogOpen(false);
+        showSnackbar('Image shared successfully!');
+      } else {
+        // Desktop - download
+        await downloadImage(generatedCanvas.canvas, filename);
+        setImageDialogOpen(false);
+        showSnackbar('Image downloaded successfully!');
+      }
+    } catch (err) {
+      console.error('Error sharing image:', err);
+      showSnackbar(err.message || 'Failed to share image');
+    }
+  };
+
+  const showSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const id = isOpen ? 'simple-popover' : undefined;
 
   return (
-    <Box
-      sx={{
-        position: 'fixed',
-        bottom: 16,
-        right: 16,
-        zIndex: 1000,
-      }}
-    >
-      <Fade in={true}>
-        <IconButton
-          onClick={handleClick}
-          sx={{
-            backgroundColor: 'primary.main',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-            },
-            width: 56,
-            height: 56,
-            boxShadow: 3,
-          }}
-        >
-          <ShareIcon />
-        </IconButton>
-      </Fade>
+    <>
       <Popover
         id={id}
-        open={open}
-        anchorEl={anchorEl}
+        open={isOpen}
+        anchorEl={currentAnchorEl}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: 'bottom',
+          vertical: 'top',
           horizontal: 'right',
         }}
       >
@@ -151,16 +211,112 @@ const Share = ({ url, title }) => {
           >
             Copy Link
           </Button>
+
+          {/* Share as Image Button */}
+          {news && (
+            <Button
+              variant="contained"
+              startIcon={<ImageIcon />}
+              fullWidth
+              onClick={handleGenerateImage}
+              disabled={isGenerating}
+              sx={{ mt: 1.5 }}
+            >
+              {isGenerating ? 'Generating...' : 'Share as Image'}
+            </Button>
+          )}
         </Box>
       </Popover>
+
+      {/* Image Preview Dialog */}
+      <Dialog
+        open={imageDialogOpen}
+        onClose={() => setImageDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          Preview Share Image
+        </DialogTitle>
+        <DialogContent>
+          {generatedCanvas && (
+            <Box
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#f5f5f5',
+                borderRadius: 2,
+                padding: 2
+              }}
+            >
+              <img
+                src={generatedCanvas.dataUrl}
+                alt="Share preview"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '600px',
+                  height: 'auto',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                }}
+              />
+            </Box>
+          )}
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setImageDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={canUseWebShareAPI() ? <IosShare /> : <Download />}
+            onClick={handleShareImage}
+          >
+            {canUseWebShareAPI() ? 'Share' : 'Download'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for messages */}
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={() => setSnackbarOpen(false)}
-        message="Link copied to clipboard"
+        message={snackbarMessage}
       />
-    </Box>
+
+      {/* Loading overlay */}
+      {isGenerating && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999
+          }}
+        >
+          <CircularProgress size={60} sx={{ color: 'white', mb: 2 }} />
+          <Typography variant="h6" sx={{ color: 'white' }}>
+            Generating shareable image...
+          </Typography>
+        </Box>
+      )}
+    </>
   );
 };
 

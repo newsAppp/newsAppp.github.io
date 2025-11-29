@@ -1,20 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, CardMedia, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip, Box } from '@mui/material';
-import { Bookmark, BookmarkBorder } from '@mui/icons-material';
+import { Card, CardMedia, CardContent, Typography, Dialog, DialogTitle, DialogContent, Box, IconButton, Tooltip } from '@mui/material';
+import { Bookmark, BookmarkBorder, Share as ShareIcon } from '@mui/icons-material';
 import OGContentList from './OGContentList';
 import { getSimilarV2 } from '../api';
 import { isBookmarked, toggleBookmark } from '../utils/bookmarkUtils';
+import Share from './Share';
+
+
 
 const NewsCard = ({ news, isHindi, onBookmarkChange }) => {
 
   const [open, setOpen] = useState(false);
   const [similarUrls, setSimilarUrls] = useState([]);
   const [imageError, setImageError] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(isBookmarked(news.article_id));
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareAnchor, setShareAnchor] = useState(null);
 
   const handleClickOpen = () => {
     setOpen(true);
   };
+
+  const handleBookmarkClick = (event) => {
+    event.stopPropagation();
+    const newBookmarkState = toggleBookmark(news.article_id, news);
+    setBookmarked(newBookmarkState);
+
+    if (onBookmarkChange) {
+      onBookmarkChange(news.article_id, newBookmarkState);
+    }
+  };
+
 
   const handleClose = () => {
     setOpen(false);
@@ -43,10 +59,20 @@ const NewsCard = ({ news, isHindi, onBookmarkChange }) => {
     const newBookmarkState = toggleBookmark(news.article_id, news);
     setBookmarked(newBookmarkState);
 
-    // Notify parent component if callback provided
     if (onBookmarkChange) {
       onBookmarkChange(news.article_id, newBookmarkState);
     }
+  };
+
+  const handleShareClick = (event) => {
+    event.stopPropagation();
+    setShareAnchor(event.currentTarget);
+    setShareOpen(true);
+  };
+
+  const handleShareClose = () => {
+    setShareOpen(false);
+    setShareAnchor(null);
   };
 
   // Initialize bookmark state
@@ -69,83 +95,106 @@ const NewsCard = ({ news, isHindi, onBookmarkChange }) => {
     }
   }, [open, news.article_id]);
 
-
-
   return (
     <div>
       <Card
         onClick={handleClickOpen}
         sx={{
-          position: 'relative',
           cursor: 'pointer',
           transition: 'transform 0.2s, box-shadow 0.2s',
           '&:hover': {
             transform: 'translateY(-4px)',
-            boxShadow: 4,
-          }
+            boxShadow: 6,
+          },
+          position: 'relative',
         }}
       >
-        {/* Bookmark Button */}
-        <Tooltip title={bookmarked ? "Remove bookmark" : "Bookmark"}>
-          <IconButton
-            onClick={handleBookmarkToggle}
-            sx={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              zIndex: 1,
-              transition: 'all 0.3s',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 1)',
-                transform: 'scale(1.15)',
-              },
-              '&:active': {
-                transform: 'scale(0.95)',
-              }
-            }}
-          >
-            {bookmarked ? (
-              <Bookmark sx={{ color: 'primary.main' }} />
-            ) : (
-              <BookmarkBorder sx={{ color: 'text.secondary' }} />
-            )}
-          </IconButton>
-        </Tooltip>
+        {/* Card Actions */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 10,
+            display: 'flex',
+            gap: 1,
+          }}
+        >
+          {/* Share Button */}
+          <Tooltip title="Share">
+            <IconButton
+              onClick={handleShareClick}
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 1)',
+                },
+                boxShadow: 2,
+              }}
+            >
+              <ShareIcon />
+            </IconButton>
+          </Tooltip>
 
-        {news.image_loc && !imageError ? (
-          <CardMedia
-            component="img"
-            alt={news.title}
-            height="200"
-            image={getImageUrl(news.image_loc)}
-            onError={handleImageError}
-          />
-        ) : (
-          <CardMedia
-            component="img"
-            alt="Placeholder"
-            height="200"
-            image="/logo/vector/default.svg"
-          />
-        )}
+          {/* Bookmark Button */}
+          <Tooltip title={bookmarked ? 'Remove bookmark' : 'Bookmark'}>
+            <IconButton
+              onClick={handleBookmarkClick}
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 1)',
+                },
+                transition: 'transform 0.2s',
+                '&:active': {
+                  transform: 'scale(0.95)',
+                },
+                boxShadow: 2,
+              }}
+            >
+              {bookmarked ? (
+                <Bookmark sx={{ color: 'primary.main' }} />
+              ) : (
+                <BookmarkBorder />
+              )}
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <CardMedia
+          component="img"
+          height="200"
+          image={getImageUrl(news.image_loc)}
+          alt={isHindi ? news.titlehindi : news.title}
+          onError={handleImageError}
+          loading="lazy"
+        />
         <CardContent>
-          <Typography variant="h5" component="div">
+          <Typography variant="h6" component="div" gutterBottom>
             {isHindi ? news.titlehindi : news.title}
           </Typography>
-          <Typography variant="body2" marginTop={2} color="text.secondary">
+          <Typography variant="body2" color="text.secondary">
             {isHindi ? news.summaryhindi : news.summary}
           </Typography>
         </CardContent>
       </Card>
+
+      {/* Share Popover */}
+      <Share
+        open={shareOpen}
+        anchorEl={shareAnchor}
+        onClose={handleShareClose}
+        url={`https://newsflash.com/article/${news.article_id}`}
+        title={isHindi ? news.titlehindi : news.title}
+        news={news}
+        isHindi={isHindi}
+      />
+
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>References</DialogTitle>
         <DialogContent>
           <OGContentList urls={similarUrls} />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
-        </DialogActions>
       </Dialog>
     </div>
   );
