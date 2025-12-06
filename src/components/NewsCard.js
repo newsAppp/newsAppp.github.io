@@ -5,15 +5,18 @@ import OGContentList from './OGContentList';
 import { getSimilarV2 } from '../api';
 import { isBookmarked, toggleBookmark } from '../utils/bookmarkUtils';
 import Share from './Share';
+import { useAuth } from '../contexts/AuthContext';
+
 
 
 
 const NewsCard = ({ news, isHindi, onBookmarkChange }) => {
+  const { user } = useAuth();
 
   const [open, setOpen] = useState(false);
   const [similarUrls, setSimilarUrls] = useState([]);
   const [imageError, setImageError] = useState(false);
-  const [bookmarked, setBookmarked] = useState(isBookmarked(news.article_id));
+  const [bookmarked, setBookmarked] = useState(isBookmarked(news.article_id, user));
   const [shareOpen, setShareOpen] = useState(false);
   const [shareAnchor, setShareAnchor] = useState(null);
 
@@ -23,7 +26,7 @@ const NewsCard = ({ news, isHindi, onBookmarkChange }) => {
 
   const handleBookmarkClick = (event) => {
     event.stopPropagation();
-    const newBookmarkState = toggleBookmark(news.article_id, news);
+    const newBookmarkState = toggleBookmark(news.article_id, news, user);
     setBookmarked(newBookmarkState);
 
     if (onBookmarkChange) {
@@ -56,7 +59,7 @@ const NewsCard = ({ news, isHindi, onBookmarkChange }) => {
 
   const handleBookmarkToggle = (e) => {
     e.stopPropagation(); // Prevent opening the dialog
-    const newBookmarkState = toggleBookmark(news.article_id, news);
+    const newBookmarkState = toggleBookmark(news.article_id, news, user);
     setBookmarked(newBookmarkState);
 
     if (onBookmarkChange) {
@@ -75,10 +78,10 @@ const NewsCard = ({ news, isHindi, onBookmarkChange }) => {
     setShareAnchor(null);
   };
 
-  // Initialize bookmark state
+  // Initialize bookmark state - refresh when user changes
   useEffect(() => {
-    setBookmarked(isBookmarked(news.article_id));
-  }, [news.article_id]);
+    setBookmarked(isBookmarked(news.article_id, user));
+  }, [news.article_id, user]);
 
   useEffect(() => {
     const fetchSimilarUrls = async () => {

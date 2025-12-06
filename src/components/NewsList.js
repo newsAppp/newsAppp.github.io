@@ -4,9 +4,12 @@ import { BookmarkBorder } from '@mui/icons-material';
 import NewsCard from './NewsCard';
 import { fetchNews } from '../api';
 import { getBookmarkedArticles } from '../utils/bookmarkUtils';
+import { usePersonalization } from '../hooks/usePersonalization';
+import { useAuth } from '../contexts/AuthContext';
 
-const NewsList = ({ selectedCategory, isHindi }) => {
-  console.log('selectedCategory 2', selectedCategory)
+const NewsList = ({ selectedCategory, isHindi, feedType }) => {
+  console.log('selectedCategory 2', selectedCategory, 'feedType', feedType)
+  const { user } = useAuth();
   const [newsList, setNewsList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(6);
@@ -14,14 +17,33 @@ const NewsList = ({ selectedCategory, isHindi }) => {
   const [hasMore, setHasMore] = useState(true);
   const [bookmarkRefresh, setBookmarkRefresh] = useState(0);
 
+  const { getPersonalizedFeed } = usePersonalization();
+
   const observer = useRef();
   const lastNewsElementRef = useRef(null);
 
   const loadNews = async (page, isInitialLoad = false) => {
+    // Handle personalized feed
+    if (feedType === 'foryou') {
+      setIsLoading(true);
+      const personalizedFeed = await getPersonalizedFeed(page, perPage);
+
+      if (personalizedFeed) {
+        setNewsList(isInitialLoad ? personalizedFeed : [...newsList, ...personalizedFeed]);
+        setHasMore(personalizedFeed.length >= perPage);
+      } else {
+        // Fallback to regular feed if not authenticated
+        const data = await fetchNews([], page, perPage);
+        setNewsList(data);
+      }
+      setIsLoading(false);
+      return;
+    }
+
     // Handle bookmarks view
     if (selectedCategory === 'bookmarks') {
       setIsLoading(true);
-      const bookmarkedArticles = getBookmarkedArticles();
+      const bookmarkedArticles = getBookmarkedArticles(user);
       setNewsList(bookmarkedArticles.reverse()); // Show newest bookmarks first
       setHasMore(false); // No pagination for bookmarks
       setIsLoading(false);
@@ -67,16 +89,11 @@ const NewsList = ({ selectedCategory, isHindi }) => {
     setCurrentPage(1);
     setHasMore(true);
     loadNews(1, true);  // Initial load for new category
-  }, [selectedCategory]);
+  }, [selectedCategory, bookmarkRefresh, feedType, user]); // Add user to reload when auth changes
 
   useEffect(() => {
-    // Reload bookmarks when bookmarkRefresh changes
-    if (selectedCategory === 'bookmarks') {
-      loadNews(1, true);
-    }
-  }, [bookmarkRefresh]);
+    if (selectedCategory === 'bookmarks' || feedType === 'foryou') return; // No pagination for bookmarks or personalized feed
 
-  useEffect(() => {
     if (currentPage > 1) {
       loadNews(currentPage);
     }

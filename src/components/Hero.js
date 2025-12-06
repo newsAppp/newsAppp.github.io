@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import NewsList from './NewsList';
 
-export default function Hero({ selectedCategory, isHindi }) {
+export default function Hero({ selectedCategory, isHindi, feedType }) {
   return (
     <Box id="hero"
       sx={(theme) => ({
@@ -25,7 +25,7 @@ export default function Hero({ selectedCategory, isHindi }) {
           pb: { xs: 8, sm: 12 },
         }}
       >
-        <NewsList selectedCategory={selectedCategory} isHindi={isHindi} ></NewsList>
+        <NewsList selectedCategory={selectedCategory} isHindi={isHindi} feedType={feedType}></NewsList>
       </Container>
     </Box>
   );
